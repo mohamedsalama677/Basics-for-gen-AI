@@ -7,7 +7,7 @@ order status via a tool call the LLM invokes mid-conversation.
 ## Pipeline
 
 ```
-Mic -> silero VAD -> Deepgram STT -> Gemini LLM <-> tools -> Cartesia TTS -> Speaker
+Mic -> silero VAD -> Deepgram STT -> Groq LLM (Llama-3.3-70b) <-> tools -> Cartesia TTS -> Speaker
 ```
 
 The full graph and turn loop are documented in the plan file. In short: VAD
@@ -15,6 +15,14 @@ segments speech into utterances, STT transcribes them, the LLM decides whether
 to answer directly or call the `get_order_status` tool, then TTS speaks the
 reply. While TTS is playing, VAD keeps listening — so if the user talks over
 the agent, the current response is interrupted and a new turn begins.
+
+> **LLM choice note.** The initial design used Gemini 2.5 Flash via
+> `livekit-plugins-google`, but its free-tier per-minute request cap (5 RPM)
+> throttles a voice conversation immediately. Swapping to **Groq's
+> Llama-3.3-70b** (via `livekit-plugins-openai` with Groq's OpenAI-compatible
+> endpoint) gives 30 RPM and lower latency for free — a much better fit for a
+> real-time voice loop. The rest of the pipeline is untouched, which is
+> exactly the vendor-decoupling story the bonus (1.2) is testing.
 
 ## Setup
 
@@ -28,12 +36,13 @@ conda activate section1-livekit
 ```
 cd section_1_livekit_voice_agent
 pip install -r requirements.txt
+pip install livekit-plugins-openai      # for the Groq/OpenAI-compatible LLM path
 ```
 
 **3. API keys**
 
 Copy `.env.example` to `.env` and fill in three keys:
-- `GEMINI_API_KEY` — from https://aistudio.google.com/apikey (you already have this)
+- `GROQ_API_KEY` — from https://console.groq.com/ (free tier, 30 RPM)
 - `DEEPGRAM_API_KEY` — from https://console.deepgram.com/ ($200 free credit on signup)
 - `CARTESIA_API_KEY` — from https://play.cartesia.ai/ (free tier)
 
@@ -121,16 +130,21 @@ Cloud STT. The full diff versus `agent.py` is one line:
 + stt=google.STT(model="latest_long"),
 ```
 
-Persona, tools, TTS and VAD are unchanged. The reason this works is that
-`AgentSession` accepts any object implementing the `STT` interface, so the
-agent code is completely decoupled from the vendor. The same would apply to
-swapping Cartesia for ElevenLabs (`tts=elevenlabs.TTS(voice=...)` after
-`pip install "livekit-agents[elevenlabs]"`) or swapping Gemini for
-GPT-4o-mini (`llm=openai.LLM(model="gpt-4o-mini")`).
+Persona, tools, LLM, TTS and VAD are unchanged. The reason this works is
+that `AgentSession` accepts any object implementing the `STT` interface, so
+the agent code is completely decoupled from the vendor. The same would apply
+to swapping Cartesia for ElevenLabs (`tts=elevenlabs.TTS(voice=...)` after
+`pip install "livekit-agents[elevenlabs]"`) or swapping the LLM from Groq
+to OpenAI (`llm=OpenAILLM(model="gpt-4o-mini")` — same class, just drop the
+`base_url`).
 
-Note: Google Cloud STT needs GCP application-default credentials, not just
-the Gemini API key. If you don't have GCP set up, treat `agent_swap.py` as
-demonstration code — the one-line swap above is the point.
+In fact the switch from Gemini to Groq that fixed the rate-limiting (see
+LLM choice note above) is a working example of the same decoupling: one
+constructor swap in `agent.py`, no changes elsewhere.
+
+Note: Google Cloud STT needs GCP application-default credentials. If you
+don't have GCP set up, treat `agent_swap.py` as demonstration code — the
+one-line swap is the point.
 
 ## Known limitations
 

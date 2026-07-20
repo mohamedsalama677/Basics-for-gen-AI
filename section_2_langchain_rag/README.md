@@ -44,7 +44,7 @@ python src/run_examples.py                               # writes examples/qa_ex
      retrieve            (FAISS top-4 with L2 scores)
          |
          v
-  grade_relevance        (score threshold + LLM yes/no on top chunk)
+  grade_relevance        (best_score vs. RELEVANCE_THRESHOLD)
       /       \
  has_context   no_context
      |             |
@@ -57,9 +57,13 @@ generate_with_ refuse_no_
 
 - `retrieve` — embeds the question, pulls the top-4 chunks and their L2
   distances.
-- `grade_relevance` — cheap gate: if the best chunk is farther than
-  `RELEVANCE_THRESHOLD`, mark out-of-scope. Otherwise ask Gemini a yes/no
-  on the top chunk. Two layers because either alone is fragile.
+- `grade_relevance` — deterministic gate: if the best chunk's FAISS L2
+  distance is above `RELEVANCE_THRESHOLD` (default 1.2 in `config.py`), mark
+  the query out-of-scope. Earlier iterations layered an LLM-as-judge yes/no
+  on top of the threshold, but on this corpus the threshold alone cleanly
+  separates in-KB (~0.6–0.9) from out-of-KB (~1.8+), so the extra LLM call
+  was removed to keep the gate cheap and deterministic. See the write-up
+  below for how I'd re-introduce a proper re-ranker at scale.
 - `generate_with_context` — prompts Gemini with the retrieved passages and
   requires it to cite each claim inline as
   `[source.md#chunk_N]`.

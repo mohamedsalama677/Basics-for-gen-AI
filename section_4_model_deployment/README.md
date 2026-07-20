@@ -37,15 +37,20 @@ python scripts/download_model.py         # ~350MB, one-time
 uvicorn app:app --app-dir src --host 0.0.0.0 --port 8000
 ```
 
-Then in another terminal:
+Then open **http://localhost:8000/docs** in a browser — FastAPI's built-in
+Swagger UI lets you try every endpoint with a click. Or from the CLI:
 
 ```
 curl http://localhost:8000/health
 
 curl -N -X POST http://localhost:8000/generate/stream \
      -H "Content-Type: application/json" \
-     -d '{"prompt":"Explain quantization in one sentence.","max_tokens":64}'
+     -d "{\"prompt\":\"Explain quantization in one sentence.\",\"max_tokens\":64}"
 ```
+
+> **Browser tip:** always use `http://localhost:8000` or `http://127.0.0.1:8000`.
+> `0.0.0.0` is a bind-address used by uvicorn internally — browsers can't route
+> to it and will show `ERR_ADDRESS_INVALID`.
 
 ## Run with Docker
 
@@ -56,7 +61,9 @@ docker run --rm -p 8000:8000 section4-llm
 ```
 
 Container startup takes a few seconds to load the GGUF weights into RAM;
-watch for a log line indicating uvicorn has bound to 8000. Then:
+watch for `Uvicorn running on http://0.0.0.0:8000` in the log. Then hit the
+same URLs — again from the **browser** at http://localhost:8000/docs, or from
+the CLI:
 
 ```
 curl http://localhost:8000/health
