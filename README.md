@@ -51,6 +51,19 @@ concurrent streaming requests and reports TTFT / total latency / tokens
 per second. Model choice is a direct execution of Section 3's conclusion
 that GGUF is the right answer for CPU / edge deployment.
 
+### [Bonus — Voice-based RAG Assistant](bonus_voice_rag/) *(additional, not required)*
+An extra I added on top of the four graded sections to demonstrate
+**system-level composition**. Combines Section 1's voice pipeline
+(Deepgram STT + Groq LLM + Cartesia TTS) with Section 2's LangGraph RAG
+retrieval into a single voice-based knowledge assistant ("Nova") — user
+speaks a question, RAG retrieves grounded chunks, Nova speaks back the
+answer. **Nothing is rewritten** — the entire bonus is under 150 lines of
+glue that imports both sections as-is, which is the whole point: it's
+proof that Sections 1 and 2 were written with clean enough module
+boundaries to compose cleanly. The README also documents "Option B" —
+how to swap the RAG generator to Section 4's local FastAPI model — as a
+narrative connection between all four required sections.
+
 ---
 
 ## Repo layout
@@ -74,12 +87,15 @@ Basics-for-gen-AI/
 ├── section_3_quantization/                (Section 3)
 │   ├── quantization_tradeoff_colab.ipynb  ← the notebook
 │   └── README.md
-└── section_4_model_deployment/            (Section 4)
-    ├── src/                               app.py, model.py, config.py
-    ├── scripts/                           download_model.py, loadtest.py
-    ├── results/loadtest_results.md
-    ├── Dockerfile
-    ├── requirements.txt
+├── section_4_model_deployment/            (Section 4)
+│   ├── src/                               app.py, model.py, config.py
+│   ├── scripts/                           download_model.py, loadtest.py
+│   ├── results/loadtest_results.md
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── README.md
+└── bonus_voice_rag/                       (Bonus — additional, not required)
+    ├── src/                               _paths.py, rag_tool.py, agent.py
     └── README.md
 ```
 
@@ -122,6 +138,14 @@ docker build -t section4-llm .            # ~5–10 min first time
 docker run --rm -p 8000:8000 section4-llm
 # Open http://localhost:8000/docs in a browser
 # Or: python scripts/loadtest.py
+```
+
+**Bonus — voice-based RAG (reuses Sections 1 + 2):**
+```
+conda activate section1-livekit
+pip install -r section_2_langchain_rag/requirements.txt      # one-time
+python section_2_langchain_rag/src/ingest.py                 # one-time
+python bonus_voice_rag/src/agent.py console
 ```
 
 Full setup, run commands, endpoint docs and half-page write-ups live in the
