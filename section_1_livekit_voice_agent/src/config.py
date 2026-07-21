@@ -30,6 +30,6 @@ CARTESIA_API_KEY = _require("CARTESIA_API_KEY")
 os.environ["DEEPGRAM_API_KEY"] = DEEPGRAM_API_KEY
 os.environ["CARTESIA_API_KEY"] = CARTESIA_API_KEY
 
-LLM_MODEL = "llama-3.3-70b-versatile"   # Groq free tier: 30 RPM, 6000 req/day
+LLM_MODEL = "llama-3.1-8b-instant"   # Groq free tier: 30 RPM, 500K tokens/day (5x the 70b budget)
 STT_MODEL = "nova-2-general"
 TTS_VOICE = "794f9389-aac1-45b6-b726-9d9369183238"  # Cartesia "Sarah" — swap freely

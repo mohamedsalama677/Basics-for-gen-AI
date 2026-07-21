@@ -16,15 +16,29 @@ VECTORSTORE_DIR = SECTION_ROOT / "vectorstore"
 
 load_dotenv(SECTION_ROOT / ".env")
 
-_raw_key = os.getenv("LLM_API_KEY", "").strip()
-if not _raw_key:
-    raise RuntimeError(
-        "LLM_API_KEY not found. Add it to section_2_langchain_rag/.env"
-    )
+# Provider selection: prefer Groq if a key is present (much more generous free
+# tier for interactive/voice use), fall back to Gemini otherwise. This is the
+# only place a provider decision is made — graph.py branches on LLM_PROVIDER.
+_groq_key = os.getenv("GROQ_API_KEY", "").strip()
+_gemini_key = os.getenv("LLM_API_KEY", "").strip()
 
-# provider glue — one place to change when swapping vendors
-os.environ["GOOGLE_API_KEY"] = _raw_key
-LLM_MODEL = "gemini-2.5-flash"
+if _groq_key:
+    LLM_PROVIDER = "groq"
+    # 8b-instant has 500K tokens/day on the free tier (vs 100K for 70b) —
+    # crucial when both the voice-agent shell AND the RAG generator share
+    # the same Groq quota in the bonus voice-RAG setup.
+    LLM_MODEL = "llama-3.1-8b-instant"
+    # keep the same env var name the openai plugin uses
+    os.environ["GROQ_API_KEY"] = _groq_key
+elif _gemini_key:
+    LLM_PROVIDER = "gemini"
+    LLM_MODEL = "gemini-2.5-flash"
+    os.environ["GOOGLE_API_KEY"] = _gemini_key
+else:
+    raise RuntimeError(
+        "No LLM key found. Set GROQ_API_KEY (preferred) or LLM_API_KEY "
+        "(Gemini) in section_2_langchain_rag/.env"
+    )
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 

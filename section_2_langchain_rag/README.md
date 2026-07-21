@@ -9,7 +9,7 @@ model never hallucinates an answer when the retriever comes up empty.
 
 - **Embeddings:** `sentence-transformers/all-MiniLM-L6-v2` (local, free)
 - **Vector store:** FAISS (local disk)
-- **LLM:** Google Gemini 2.5 Flash (via `langchain-google-genai`)
+- **LLM:** Groq Llama-3.3-70b (preferred) *or* Google Gemini 2.5 Flash, auto-detected
 - **Orchestration:** LangGraph
 
 ## Setup
@@ -18,14 +18,26 @@ model never hallucinates an answer when the retriever comes up empty.
 conda activate section2-rag
 ```
 
-The `.env` file at this section's root must contain:
+The `.env` file at this section's root must contain **one** of these keys.
+The code prefers Groq if both are present, because Groq's free tier is
+much more generous than Gemini's free tier (Gemini 2.5 Flash caps at 5
+RPM / 20 requests per day, which is easily exhausted during voice-loop
+testing).
 
 ```
-LLM_API_KEY=<your Gemini API key>
+GROQ_API_KEY=<your Groq key>     # preferred — https://console.groq.com/
+# or, fallback:
+LLM_API_KEY=<your Gemini key>    # legacy — https://aistudio.google.com/apikey
 ```
 
-The generic name is intentional — swap providers by changing two lines in
-`src/config.py` (the `os.environ[...]` line and `LLM_MODEL`).
+If you use Groq, install its adapter once:
+
+```
+pip install langchain-openai
+```
+
+Provider selection is centralised in `src/config.py` — swap models or
+providers by editing the `LLM_PROVIDER` / `LLM_MODEL` block there.
 
 ## Run
 

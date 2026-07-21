@@ -5,18 +5,20 @@
 Load the FAISS index once at module scope. Nodes are pure state transformers.
 """
 
+import os
 from functools import lru_cache
 from typing import TypedDict
 
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.language_models import BaseChatModel
 from langgraph.graph import END, START, StateGraph
 
 from config import (
     EMBEDDING_MODEL,
     LLM_MODEL,
+    LLM_PROVIDER,
     REFUSAL_MESSAGE,
     RELEVANCE_THRESHOLD,
     TOP_K,
@@ -45,7 +47,20 @@ def _get_vectorstore() -> FAISS:
 
 
 @lru_cache(maxsize=1)
-def _get_llm() -> ChatGoogleGenerativeAI:
+def _get_llm() -> BaseChatModel:
+    if LLM_PROVIDER == "groq":
+        # Groq exposes an OpenAI-compatible endpoint — use the openai package
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=LLM_MODEL,
+            base_url="https://api.groq.com/openai/v1",
+            api_key=os.environ["GROQ_API_KEY"],
+            temperature=0.2,
+        )
+    # Gemini fallback (works if LLM_API_KEY is set in .env instead of GROQ_API_KEY)
+    from langchain_google_genai import ChatGoogleGenerativeAI
+
     return ChatGoogleGenerativeAI(model=LLM_MODEL, temperature=0.2)
 
 
