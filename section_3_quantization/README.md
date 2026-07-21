@@ -16,10 +16,10 @@ to a **T4 GPU** (free tier is enough), and run top-to-bottom.
 
 The comparison needs a real CUDA GPU — `bitsandbytes` 4-bit inference is
 CUDA-only. I don't have a local GPU, so the notebook targets a free Colab
-T4. Reviewers who want to reproduce the numbers just open the notebook, hit
-"Run all", and get their own results in ~5 minutes. Everything the graded
-write-up refers to (memory, throughput, quality) is produced by cells inside
-the notebook and printed inline.
+T4. Anyone who wants to reproduce the numbers just opens the notebook,
+hits "Run all", and gets their own results in ~5 minutes. Everything the
+write-up refers to (memory, throughput, quality) is produced by cells
+inside the notebook and printed inline.
 
 ## Model and setup
 
@@ -97,8 +97,8 @@ you trade size for quality flexibly, and the llama.cpp runtime runs almost
 anywhere with a small memory footprint and no Python required. Raw GPU
 throughput is lower than AWQ/GPTQ on a proper GPU, but for **local /
 desktop apps, offline use, or "no GPU available"** it's unbeatable for
-portability — which is exactly why **Section 4 of this same submission
-serves a GGUF model in a CPU-only Docker container**.
+portability — which is exactly why **Section 4 of this same repo serves
+a GGUF model in a CPU-only Docker container**.
 
 **Decision in one line:** fine-tuning or quick experiments →
 **bitsandbytes**; high-throughput GPU serving, quantize-once → **AWQ**

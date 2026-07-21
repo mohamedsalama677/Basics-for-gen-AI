@@ -1,8 +1,11 @@
-# Electro Pi — AI Engineer Technical Test
+# Generative AI — Reference Implementations
 
-Submission for the Electro Pi Mid-Level AI Engineer take-home test. Four
-independent sections, one folder each, each with its own README and its own
-`run` instructions.
+A hands-on portfolio project covering four production-adjacent skills for
+building generative-AI systems: real-time voice agents, retrieval-augmented
+generation, model quantization trade-offs, and Dockerized model serving.
+Each skill is a self-contained folder with its own README and its own
+`run` instructions, plus a bonus section that composes two of them into a
+single voice-based knowledge assistant.
 
 Author: **Mohamed Salama** — mohamed.salama@hexifyer.com
 
@@ -51,18 +54,18 @@ concurrent streaming requests and reports TTFT / total latency / tokens
 per second. Model choice is a direct execution of Section 3's conclusion
 that GGUF is the right answer for CPU / edge deployment.
 
-### [Bonus — Voice-based RAG Assistant](bonus_voice_rag/) *(additional, not required)*
-An extra I added on top of the four graded sections to demonstrate
-**system-level composition**. Combines Section 1's voice pipeline
-(Deepgram STT + Groq LLM + Cartesia TTS) with Section 2's LangGraph RAG
-retrieval into a single voice-based knowledge assistant ("Nova") — user
-speaks a question, RAG retrieves grounded chunks, Nova speaks back the
-answer. **Nothing is rewritten** — the entire bonus is under 150 lines of
-glue that imports both sections as-is, which is the whole point: it's
-proof that Sections 1 and 2 were written with clean enough module
-boundaries to compose cleanly. The README also documents "Option B" —
-how to swap the RAG generator to Section 4's local FastAPI model — as a
-narrative connection between all four required sections.
+### [Bonus — Voice-based RAG Assistant](bonus_voice_rag/) *(composition demo)*
+A layer on top of the four core sections to demonstrate **system-level
+composition**. Combines Section 1's voice pipeline (Deepgram STT + Groq
+LLM + Cartesia TTS) with Section 2's LangGraph RAG retrieval into a
+single voice-based knowledge assistant ("Nova") — user speaks a
+question, RAG retrieves grounded chunks, Nova speaks back the answer.
+**Nothing is rewritten** — the entire bonus is under 150 lines of glue
+that imports both sections as-is, which is the whole point: it's proof
+that Sections 1 and 2 were written with clean enough module boundaries
+to compose cleanly. The README also documents "Option B" — how to swap
+the RAG generator to Section 4's local FastAPI model — as a narrative
+connection between all four core sections.
 
 ---
 

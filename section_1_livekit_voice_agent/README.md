@@ -148,7 +148,7 @@ one-line swap is the point.
 
 ## Known limitations
 
-- **Console mode only.** Not tested against LiveKit Cloud in this submission.
+- **Console mode only.** Not tested against LiveKit Cloud in this project.
   The same code should work in `dev` mode with `LIVEKIT_URL` /
   `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` set.
 - **Single tool.** The write-up covers how a second tool would be added

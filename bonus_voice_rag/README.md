@@ -1,20 +1,19 @@
 # Bonus — Voice-based RAG Assistant
 
-> **⚠️ ADDITIONAL / NOT REQUIRED BY THE ASSESSMENT.**
-> The four graded sections (1–4) are complete on their own. This folder
+> **Composition layer on top of Sections 1 and 2.**
+> The four core sections (1–4) are complete on their own. This folder
 > combines Section 1's voice pipeline with Section 2's RAG graph into a
 > single voice-based knowledge assistant to demonstrate system-level
 > composition, and to show that the earlier sections were written with
 > clean enough module boundaries that they compose cleanly.
 
-## Why I built it
+## Why it exists
 
 Individually, Section 1 (voice) and Section 2 (RAG) each prove one
 competency. Together they demonstrate *system thinking* — how those pieces
 snap into a real product surface (a voice interface for asking questions
 against a knowledge base). That composition is the actual output companies
-buy; the individual sections are the ingredients. I wanted the submission
-to show both.
+buy; the individual sections are the ingredients. This folder shows both.
 
 Hard constraint: **nothing from Sections 1 or 2 was rewritten.** Everything
 here is imports. If the reuse story doesn't hold, the bonus loses its
@@ -135,7 +134,7 @@ lines — those are proof the RAG graph is being invoked mid-conversation.
 The default RAG generator is Gemini (Option A). To point it at Section 4's
 local Qwen-0.5B FastAPI service instead — closing the loop on all four
 sections — three changes are needed. I chose not to implement this in the
-submission to keep scope tight, but the design is straightforward:
+current build to keep scope tight, but the design is straightforward:
 
 1. **Start Section 4's container** in a separate terminal:
    ```
@@ -180,14 +179,14 @@ four sections were designed to fit together.
   and Section 2 exist and their `.env` files are populated. Missing pieces
   raise clear errors on startup, but the coupling is real by design.
 - **Citations are dropped from the spoken output.** They're logged to the
-  console so a reviewer can verify grounding, but reading
+  console so grounding can be verified, but reading
   "`01_llms_and_transformers.md#chunk_3`" aloud would be jarring. A
   production version would summarize sources ("*from our LLM docs*")
   instead.
-- **Reviewer must run `ingest.py` first.** The FAISS index isn't
-  committed; it's built on-demand from `section_2_langchain_rag/docs/`.
+- **`ingest.py` must run first.** The FAISS index isn't committed; it's
+  built on-demand from `section_2_langchain_rag/docs/`.
 - **Console mode only.** Same limitation as Section 1 — not tested against
-  LiveKit Cloud in this submission.
+  LiveKit Cloud in this project.
 - **Two hosted APIs, one voice conversation.** Groq for the conversational
   LLM, Gemini for the grounded generator. If either is rate-limited, the
   session degrades. Option B (Section-4 local LLM) removes the second

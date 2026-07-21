@@ -15,8 +15,8 @@ fires 10 concurrent streaming requests and reports TTFT / total latency.
   the CPU / edge deployment path recommended in Section 3's write-up —
   Section 4 is that recommendation put into practice.
 - **API:** FastAPI + uvicorn. vLLM and TGI are GPU-first and heavier to
-  containerize; the assessment allows FastAPI and it lets me demonstrate
-  async + streaming plainly.
+  containerize. FastAPI is the simplest way to demonstrate async +
+  streaming while keeping the container CPU-portable.
 - **Container:** `python:3.11-slim`, CPU-only. Model is baked in at build
   time so `docker run` needs no network. Works on any machine with Docker.
 
@@ -173,4 +173,4 @@ here is the right skeleton to swap the backend into.
   would need API keys and per-user quotas at the gateway.
 - **SSE format only.** The streaming endpoint uses SSE, not raw newline-
   delimited chunks. It's easy to add an alternate content-type if a
-  reviewer needs one.
+  consumer needs one.
